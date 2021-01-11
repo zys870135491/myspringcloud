@@ -374,7 +374,39 @@ service-url:
           include: '*'
   ```
 
+- springcloud 微服务之间传递token解决方案
 
+```java
+//springcloud 微服务之间传递token解决方案
+//这里可以使用Feign的RequestInterceptor，把request里的请求参数包括请求头全部复制到feign的request里
+@Configuration
+public class FeginInterceptor implements RequestInterceptor {
+    @Override
+    public void apply(RequestTemplate requestTemplate) {
+        try {
+            Map<String,String> headers = getHeaders();
+            for(String headerName : headers.keySet()){
+                requestTemplate.header(headerName, headers.get(headerName));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    // 调用的微服务里可以这样取到header里的数据
+    private Map<String, String> getHeaders(){
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        Map<String, String> map = new LinkedHashMap<>();
+        Enumeration<String> enumeration = request.getHeaderNames();
+        while (enumeration.hasMoreElements()) {
+            String key = enumeration.nextElement();
+            String value = request.getHeader(key);
+            map.put(key, value);
+        }
+        return map;
+    }
+}
+  ```
 
 #### 10.cloudalibaba-sentinel-nacos-provider-payment9004(sentinel整合openfeign+fallback的提供者)
 
@@ -421,7 +453,7 @@ service-url:
 
 
 
-#### 10.cloudalibaba-sentinel-nacos-consumer-order84(sentinel整合openfeign+fallback的消费者)
+#### 11.cloudalibaba-sentinel-nacos-consumer-order84(sentinel整合openfeign+fallback的消费者)
 
 > sentinel自定义兜底方法（一定要和controller层方法的参数保持一致(@PathVariable("id") Long id 一定要加)，方法一定要加static）
 
@@ -546,7 +578,7 @@ service-url:
 
 
 
-#### 11.cloud-gateway-gateway9527(gateWay网关)
+#### 12.cloud-gateway-gateway9527(gateWay网关)
 
 - 启动类
 
