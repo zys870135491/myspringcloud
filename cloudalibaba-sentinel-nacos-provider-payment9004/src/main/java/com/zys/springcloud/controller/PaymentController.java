@@ -1,14 +1,22 @@
 package com.zys.springcloud.controller;
 
 
+import com.netflix.client.http.HttpHeaders;
+import com.netflix.client.http.HttpRequest;
 import com.zys.springcloud.entities.CommonResult;
 import com.zys.springcloud.entities.Payment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 @RestController
@@ -38,7 +46,20 @@ public class PaymentController
         return result;
     }
 
-
+    @GetMapping(value = "/paymentToken/{id}")
+    public CommonResult<Payment> paymentToken(@PathVariable("id") Long id){
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        Map<String, String> map = new LinkedHashMap<>();
+        Enumeration<String> enumeration = request.getHeaderNames();
+        while (enumeration.hasMoreElements()) {
+            String key = enumeration.nextElement();
+            String value = request.getHeader(key);
+            map.put(key, value);
+        }
+        Payment payment = hashMap.get(id);
+        CommonResult<Payment> result = new CommonResult(200,"from mysql,serverPort:  "+serverPort,payment);
+        return result;
+    }
 
 }
 

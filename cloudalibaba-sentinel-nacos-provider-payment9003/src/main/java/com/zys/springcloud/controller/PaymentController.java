@@ -3,6 +3,8 @@ package com.zys.springcloud.controller;
 
 import com.zys.springcloud.entities.CommonResult;
 import com.zys.springcloud.entities.Payment;
+import com.zys.springcloud.service.TokenService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +19,9 @@ public class PaymentController
     @Value("${server.port}")
     private String serverPort;
 
+    @Autowired
+    private TokenService tokenService;
+
     public static HashMap<Long, Payment> hashMap = new HashMap<>();
     static{
         hashMap.put(1L,new Payment(1L,"28a8c1e3bc2742d8848569891fb42181"));
@@ -26,6 +31,7 @@ public class PaymentController
 
     @GetMapping(value = "/paymentSQL/{id}")
     public CommonResult<Payment> paymentSQL(@PathVariable("id") Long id){
+        tokenService.paymentToken(id);
         Payment payment = hashMap.get(id);
         CommonResult<Payment> result = new CommonResult(200,"from mysql,serverPort:  "+serverPort,payment);
         return result;
